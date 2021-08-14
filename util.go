@@ -28,13 +28,12 @@ func memhash(p unsafe.Pointer, h, s uintptr) uintptr
 func memhashMap(msg interface{}) uint64 {
 	switch val := msg.(type) {
 	case string:
-		strhv := *(*reflect.StringHeader)(unsafe.Pointer(&val))
+		valPtr := unsafe.Pointer(&val)
+		strhv := (*reflect.StringHeader)(valPtr)
 
-		return uint64(memhash(unsafe.Pointer(strhv.Data), 0, uintptr(strhv.Len)))
-	case []byte:
-		strhv := *(*reflect.SliceHeader)(unsafe.Pointer(&val))
+		dataPtr := unsafe.Pointer(strhv.Data)
 
-		return uint64(memhash(unsafe.Pointer(strhv.Data), 0, uintptr(strhv.Len)))
+		return uint64(memhash(dataPtr, 0, uintptr(strhv.Len)))
 	case int:
 		return uint64(memhash(unsafe.Pointer(&val), 0, unsafe.Sizeof(val)))
 	case uint:
